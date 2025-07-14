@@ -1,4 +1,10 @@
+import { Placeholder } from "@/components/placeholder"
+import { Button } from "@/components/ui/button"
 import { initialTickets } from "@/data"
+import { TicketItem } from "@/features/ticket/components/ticket-item"
+import { getTicket } from "@/features/ticket/queries/get-ticket"
+import { ticketsPath } from "@/paths"
+import Link from "next/link"
 
 
 type TicketPage = {
@@ -8,12 +14,24 @@ type TicketPage = {
 }
 
 
-const TicketPage = ({params} : TicketPage) => {
-    const tickets = initialTickets.find((ticket) => (ticket.id === params.ticketId))
+const TicketPage = async ({params} : TicketPage) => {
+    const ticketId  = params.ticketId; 
+    const ticket =  await getTicket(ticketId)
+    if(!ticket){
+        return(
+            <Placeholder 
+                label="ticket not find"
+                button = {
+                    <Button asChild variant="outline">
+                        <Link href={ticketsPath()}>Go to the tickets</Link>
+                    </Button>
+                }
+                />
+        )
+    }
     return(
-        <div>
-            <p className="text-lg">{tickets?.title}</p>
-            <p className="text-sm">{tickets?.content}</p>
+        <div className="flex justify-center">
+            <TicketItem ticket={ticket} isDetail />
         </div>
     )
 }
